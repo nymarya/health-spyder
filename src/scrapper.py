@@ -35,5 +35,5 @@ print('Searching for table 10.A')
 tables = soup.findAll("table")
 for table in tables:
     table_label = table.previous_element
-    if table_label.contains("Tabela 10.A"):
-        print(table)
+    if "Tabela 10.A" in table_label:
+        print(table.prettify())
