@@ -1,5 +1,5 @@
 import scrapper
 
 # Recover all tables
-scrapper.recover(240010)
+scrapper.recover_all()
 # Save them into a csv file

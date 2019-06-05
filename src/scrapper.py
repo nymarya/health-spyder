@@ -22,7 +22,7 @@ def recover(city):
     }
 
     url = "http://indicadoressifilis.aids.gov.br/tabelas.php"
-    response = requests.post(url, headers=headers, data={})
+    response = requests.post(url, headers=headers, data=data)
 
     html_data = response.text
     print(type(html_data))
@@ -48,6 +48,7 @@ def recover(city):
 
             final_df = df.pivot(index='ibge', columns='Diagnóstico Final',
                                 values=columns_year)
+            print(final_df)
 
             return final_df
 
@@ -58,6 +59,10 @@ def recover_all():
     """ Recover all cities
     """
 
+    codigos = pd.read_csv("data/codigo_municipio.csv", header=None)[0].values
+    df = pd.DataFrame()
 
-
+    for codigo in codigos:
+        df = df.append(recover(codigo))
+        print(df)
 
