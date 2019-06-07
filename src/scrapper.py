@@ -48,7 +48,6 @@ def recover(city):
 
             final_df = df.pivot(index='ibge', columns='Diagnóstico Final',
                                 values=columns_year)
-            print(final_df)
 
             return final_df
 
@@ -64,5 +63,5 @@ def recover_all():
 
     for codigo in codigos:
         df = df.append(recover(codigo))
-        print(df)
 
+    df.to_csv('data/final.csv')
