@@ -33,6 +33,7 @@ def recover(city):
     soup = BeautifulSoup(html_data, features="html.parser")
 
     tables = soup.findAll("table")
+    final_df = pd.DataFrame()
     for table in tables:
         table_label = table.previous_element
         if "Tabela 12.A" in table_label:
@@ -41,14 +42,13 @@ def recover(city):
             columns_year = [c.text for c in table.find(id=tag).findAll('th')]
             columns_year.pop(0)
 
+            # Save table to dataframe
             df = pd.read_html(str(table))[0]
-            print(df)
-            df['ibge'] = city
+            df['Table'] = ''.join(table_label.split('.')[0:2])
+            df.rename(columns={df.columns[0]: "Value"}, inplace=True)
+            final_df = final_df.append(df)
 
-            final_df = df.pivot(index='ibge', columns='Diagnóstico Final',
-                                values=columns_year)
-
-            final_df.to_csv('results/{}.csv'.format(city), sep=';')
+    final_df.to_csv('results/{}.csv'.format(city), sep=';')
 
     return True
 
