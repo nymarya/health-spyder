@@ -6,7 +6,7 @@ import multiprocessing as mp
 from os import listdir
 from os.path import isfile, join
 
-def recover(city):
+def recover(code, filename=None):
     """ Recover cities by IBGE code
         -- city: IBGE code
     """
@@ -21,11 +21,11 @@ def recover(city):
 
     data = {
         'MIME Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'id2': city
+        'id2': code
     }
 
     url = "http://indicadoressifilis.aids.gov.br/tabelas.php"
-    response = requests.get(url, headers=headers, data=data)
+    response = requests.post(url, headers=headers, data=data)
 
     html_data = response.text
     # print(html_data)
@@ -49,12 +49,15 @@ def recover(city):
         df.rename(columns={df.columns[0]: "Value"}, inplace=True)
         final_df = final_df.append(df, ignore_index=True)
 
-    final_df.to_csv('results/{}.csv'.format(city), sep=';')
+    if filename is None:
+        filename = code
+    print("Saving {}.csv".format(filename))
+    final_df.to_csv('results/{}.csv'.format(filename), sep=';')
 
     return True
 
 
-def recover_all():
+def recover_cities():
     """ Recover all cities
     """
 
@@ -62,7 +65,8 @@ def recover_all():
     df = pd.DataFrame()
 
     # Get codes that were not downloaded yet
-    files = [int(f.split('.')[0]) for f in listdir('results/') if isfile(join('results/', f))]
+    files = [int(f.split('.')[0]) for f in listdir('results/')
+             if isfile(join('results/', f))]
     codes = list(set(codes) - set(files))
 
     # Create chunks to parallelize search
@@ -70,17 +74,17 @@ def recover_all():
     pool = mp.Pool(4)
 
     results = pool.map(recover, codes)
-    # # print(results)
-    # for city in [[220770]]:
-    #     recover(city)
-
-    # df.to_csv('results/final.csv')
 
 
-# def execute():
-#  cities = City.objects.all().values('ibge')
-#  chunks = create_chunks(cities, num_rows=700)
-#  pool = mp.Pool(len(chunks))
+def recover_regions():
+    pairs = pd.read_csv("data/codigos.csv", header=None, index_col=None).values
 
-#  results = [pool.apply_async(recover, args=(x,)) for x in chunks]
-#  print([result.get() for result in results])
+    codes = [(pair[0], pair[1]) for pair in pairs]
+
+    pool = mp.Pool(4)
+
+    results = pool.starmap(recover, codes)
+
+
+def recover_all():
+    recover_regions()
