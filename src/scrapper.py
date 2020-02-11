@@ -51,8 +51,8 @@ def recover(code, filename=None):
         cols = df.columns[df.columns.str.startswith('20')]
         cols2 = df.columns[df.columns.str.startswith('19')]
         columns = list(set(cols).union(set(cols2)))
-        
-        # Melt dataframe to group all years to one column 
+
+        # Melt dataframe to group all years to one column
         melted = pd.melt(df, id_vars=[df.columns[0]], value_vars=columns,
                          var_name='Ano', value_name='Valor')
         melted['Tabela'] = ''.join(table_label.split('.')[0:2])
@@ -73,6 +73,8 @@ def recover(code, filename=None):
     # Tranform string to numeric
     final_df[cols] = final_df[cols].apply(pd.to_numeric)
     final_df[cols2] = final_df[cols2].apply(pd.to_numeric)
+
+    final _df['Codigo'] = code
 
     # Save CSV
     final_df.to_csv('results/{}.csv'.format(filename), sep=';',
