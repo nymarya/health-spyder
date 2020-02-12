@@ -70,11 +70,11 @@ def recover(code, filename=None):
     cols = final_df.columns[final_df.columns.str.startswith('20')]
     cols2 = final_df.columns[final_df.columns.str.startswith('19')]
 
-    # Tranform string to numeric
+    # Transform string to numeric
     final_df[cols] = final_df[cols].apply(pd.to_numeric)
     final_df[cols2] = final_df[cols2].apply(pd.to_numeric)
 
-    final _df['Codigo'] = code
+    final_df['Codigo'] = filename
 
     # Save CSV
     final_df.to_csv('results/{}.csv'.format(filename), sep=';',
@@ -88,7 +88,10 @@ def recover_cities():
     """
 
     codes = pd.read_csv("data/codigo_municipio.csv", header=None)[0].values
-    df = pd.DataFrame()
+
+    # files = [int(f.split('.')[0]) for f in listdir('results/')
+    #          if isfile(join('results/', f)) and f[0].isdigit()]
+    # codes = list(set(codes) - set(files))
 
     # Parallelize downloads
     pool = mp.Pool(4)
@@ -108,5 +111,5 @@ def recover_regions():
 
 
 def recover_all():
-    recover_cities()
     recover_regions()
+    recover_cities()
